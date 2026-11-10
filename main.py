@@ -36,7 +36,7 @@ async def require_dashboard_password(request, call_next):
             headers={"WWW-Authenticate": 'Basic realm="Kalshi Control"'},
         )
     return await call_next(request)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def as_float(value: Any) -> float | None:
