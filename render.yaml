@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: kalshi-control
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: APP_PASSWORD
+        sync: false
+      - key: KALSHI_BASE_URL
+        value: https://external-api.kalshi.com/trade-api/v2
