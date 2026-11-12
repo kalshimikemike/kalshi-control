@@ -173,6 +173,96 @@ async def markets(
     }
 
 
+# Dedicated 15-minute crypto scanner
+@app.get("/api/crypto/15m")
+async def crypto_15m():
+
+    series = {
+        "BTC": "KXBTC15M",
+        "ETH": "KXETH15M",
+        "DOGE": "KXDOGE15M",
+        "ZEC": "KXZEC15M"
+    }
+
+    results = []
+
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+
+            for coin, series_ticker in series.items():
+
+                response = await client.get(
+                    f"{BASE_URL}/markets",
+                    params={
+                        "status": "open",
+                        "series_ticker": series_ticker,
+                        "limit": 20
+                    }
+                )
+                response.raise_for_status()
+
+                payload = response.json()
+
+                for m in payload.get("markets", []):
+
+                    yes_bid = as_float(m.get("yes_bid_dollars"))
+                    yes_ask = as_float(m.get("yes_ask_dollars"))
+                    no_bid = as_float(m.get("no_bid_dollars"))
+                    no_ask = as_float(m.get("no_ask_dollars"))
+
+                    spread = (
+                        round(yes_ask - yes_bid, 4)
+                        if yes_ask is not None and yes_bid is not None
+                        else None
+                    )
+
+                    volume = (
+                        as_float(m.get("volume_fp"))
+                        or as_float(m.get("volume"))
+                        or 0
+                    )
+
+                    results.append({
+                        "coin": coin,
+                        "ticker": m.get("ticker"),
+                        "series_ticker": series_ticker,
+                        "title": m.get("title") or m.get("subtitle"),
+                        "yes_bid": yes_bid,
+                        "yes_ask": yes_ask,
+                        "no_bid": no_bid,
+                        "no_ask": no_ask,
+                        "yes_spread": spread,
+                        "last_price": as_float(
+                            m.get("last_price_dollars")
+                        ),
+                        "volume": volume,
+                        "open_interest": (
+                            as_float(m.get("open_interest_fp"))
+                            or as_float(m.get("open_interest"))
+                            or 0
+                        ),
+                        "close_time": m.get("close_time"),
+                        "status": m.get("status")
+                    })
+
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Crypto scanner request failed: {exc}"
+        )
+
+    results.sort(
+        key=lambda item: item["volume"],
+        reverse=True
+    )
+
+    return {
+        "markets": results,
+        "count": len(results),
+        "coins": list(series.keys()),
+        "mode": "market-discovery-only"
+    }
+
 # Market order book
 @app.get("/api/markets/{ticker}/orderbook")
 async def orderbook(ticker: str):
