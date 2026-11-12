@@ -26,7 +26,7 @@ app = FastAPI(
 @app.middleware("http")
 async def require_dashboard_password(request, call_next):
 
-    if request.url.path in ("/health", "/api/health"):
+    if request.url.path in ("/health", "/api/health") or request.url.path.startswith("/static/"):
         return await call_next(request)
 
     expected = os.getenv("APP_PASSWORD")
