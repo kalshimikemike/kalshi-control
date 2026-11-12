@@ -1,4 +1,5 @@
 
+
 from datetime import datetime, timezone, timedelta
 from typing import Any
 import os
@@ -17,16 +18,18 @@ BASE_URL = os.getenv(
 
 app = FastAPI(
     title="Kalshi Phone Dashboard",
-    version="0.1.2"
+    version="0.2.0"
 )
 
 
-# Password protection
-# Render health checks are allowed without a password.
+# PASSWORD PROTECTION
 @app.middleware("http")
 async def require_dashboard_password(request, call_next):
 
-    if request.url.path in ("/health", "/api/health") or request.url.path.startswith("/static/"):
+    if (
+        request.url.path in ("/health", "/api/health")
+        or request.url.path.startswith("/static/")
+    ):
         return await call_next(request)
 
     expected = os.getenv("APP_PASSWORD")
@@ -62,7 +65,7 @@ async def require_dashboard_password(request, call_next):
     return await call_next(request)
 
 
-# Dashboard files
+# DASHBOARD FILES
 app.mount(
     "/static",
     StaticFiles(directory="static"),
@@ -77,13 +80,13 @@ def as_float(value: Any) -> float | None:
         return None
 
 
-# Main dashboard
+# MAIN DASHBOARD
 @app.get("/")
 async def home():
     return FileResponse("static/index.html")
 
 
-# Manifest
+# MANIFEST
 @app.get("/manifest.webmanifest")
 async def manifest():
     return FileResponse(
@@ -92,7 +95,7 @@ async def manifest():
     )
 
 
-# Render health check
+# HEALTH CHECKS
 @app.get("/health")
 async def render_health():
     return {"ok": True}
@@ -107,7 +110,7 @@ async def health():
     }
 
 
-# Open markets
+# GENERAL OPEN MARKETS
 @app.get("/api/markets")
 async def markets(
     limit: int = Query(100, ge=1, le=200),
@@ -173,7 +176,7 @@ async def markets(
     }
 
 
-# Dedicated 15-minute crypto scanner
+# DEDICATED 15-MINUTE CRYPTO SCANNER
 @app.get("/api/crypto/15m")
 async def crypto_15m():
 
@@ -185,36 +188,55 @@ async def crypto_15m():
     }
 
     results = []
+    errors = []
 
     try:
         async with httpx.AsyncClient(timeout=20) as client:
 
             for coin, series_ticker in series.items():
 
-                response = await client.get(
-                    f"{BASE_URL}/markets",
-                    params={
-                        "status": "open",
-                        "series_ticker": series_ticker,
-                        "limit": 20
-                    }
-                )
-                response.raise_for_status()
+                try:
+                    response = await client.get(
+                        f"{BASE_URL}/markets",
+                        params={
+                            "status": "open",
+                            "series_ticker": series_ticker,
+                            "limit": 20
+                        }
+                    )
 
-                payload = response.json()
+                    response.raise_for_status()
+                    payload = response.json()
+
+                except httpx.HTTPError as exc:
+                    errors.append({
+                        "coin": coin,
+                        "error": str(exc)
+                    })
+                    continue
 
                 for m in payload.get("markets", []):
+
+                    ticker = m.get("ticker") or ""
+
+                    # Only accept markets belonging to this series.
+                    if not ticker.startswith(series_ticker + "-"):
+                        continue
+
+                    actual_series = m.get("series_ticker")
+
+                    if actual_series and actual_series != series_ticker:
+                        continue
 
                     yes_bid = as_float(m.get("yes_bid_dollars"))
                     yes_ask = as_float(m.get("yes_ask_dollars"))
                     no_bid = as_float(m.get("no_bid_dollars"))
                     no_ask = as_float(m.get("no_ask_dollars"))
 
-                    spread = (
-                        round(yes_ask - yes_bid, 4)
-                        if yes_ask is not None and yes_bid is not None
-                        else None
-                    )
+                    spread = None
+
+                    if yes_bid is not None and yes_ask is not None:
+                        spread = round(yes_ask - yes_bid, 4)
 
                     volume = (
                         as_float(m.get("volume_fp"))
@@ -224,9 +246,13 @@ async def crypto_15m():
 
                     results.append({
                         "coin": coin,
-                        "ticker": m.get("ticker"),
+                        "ticker": ticker,
                         "series_ticker": series_ticker,
-                        "title": m.get("title") or m.get("subtitle"),
+                        "title": (
+                            m.get("title")
+                            or m.get("subtitle")
+                            or ticker
+                        ),
                         "yes_bid": yes_bid,
                         "yes_ask": yes_ask,
                         "no_bid": no_bid,
@@ -260,10 +286,12 @@ async def crypto_15m():
         "markets": results,
         "count": len(results),
         "coins": list(series.keys()),
+        "errors": errors,
         "mode": "market-discovery-only"
     }
 
-# Market order book
+
+# MARKET ORDER BOOK
 @app.get("/api/markets/{ticker}/orderbook")
 async def orderbook(ticker: str):
 
@@ -282,7 +310,7 @@ async def orderbook(ticker: str):
         )
 
 
-# Market candlesticks
+# MARKET CANDLESTICKS
 @app.get("/api/markets/{ticker}/candlesticks")
 async def candlesticks(
     ticker: str,
@@ -326,4 +354,3 @@ async def candlesticks(
             status_code=502,
             detail=f"Kalshi candlestick request failed: {exc}"
         )
-
