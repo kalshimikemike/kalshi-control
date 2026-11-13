@@ -1,72 +1,814 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10141c"><link rel="manifest" href="/manifest.webmanifest">
-  <title>Kalshi Control</title>
-  <style>
-    :root{color-scheme:dark;--bg:#0b0f16;--panel:#141b26;--panel2:#1a2432;--text:#eef3fa;--muted:#9eacbd;--line:#293648;--green:#3bd49b;--red:#ff6969;--blue:#76aaff;--amber:#f3c66d}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 14px calc(24px + env(safe-area-inset-bottom));max-width:760px;margin-inline:auto}
-    header{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 14px}h1{font-size:22px;margin:0}h2{font-size:17px;margin:0 0 12px}.sub,.muted{color:var(--muted);font-size:12px}.status{font-size:11px;border:1px solid var(--line);border-radius:99px;padding:6px 9px;color:var(--green)}
-    .banner{background:#332a17;border:1px solid #65502a;color:#ffe2a4;padding:12px;border-radius:13px;font-size:12px;line-height:1.45;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:11px}.metric{font-size:23px;font-weight:700;margin-top:5px}.label{font-size:11px;color:var(--muted)}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.section{margin-top:19px}.btn{border:0;border-radius:11px;background:var(--blue);color:#07111f;padding:11px 13px;font-weight:700;font-size:13px}.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.btn.danger{background:#a8323b;color:white}.btn:disabled{opacity:.4}.field{width:100%;background:#0d131d;border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px;font-size:15px;margin-top:6px}.fieldrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.market{padding:13px 0;border-top:1px solid var(--line)}.market:first-child{border-top:0}.market-title{font-weight:650;font-size:14px;line-height:1.35}.tag{font-size:10px;color:var(--muted);background:var(--panel2);padding:4px 7px;border-radius:99px}.prob{height:7px;background:#263242;border-radius:9px;overflow:hidden;margin:9px 0}.prob>i{display:block;height:100%;background:var(--green)}.actions{display:flex;gap:7px;margin-top:9px}.actions button{flex:1}.pill{font-size:11px;padding:5px 8px;border-radius:8px;background:#172b26;color:var(--green)}.dangertext{color:var(--red)}.good{color:var(--green)}.small{font-size:11px;color:var(--muted);line-height:1.5}.pos{padding:10px 0;border-top:1px solid var(--line)}.hidden{display:none!important}
-    @media(min-width:600px){body{padding-inline:22px}.metric{font-size:27px}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#080d18">
+<title>Kalshi Control</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#080d18;
+  --panel:#111a2a;
+  --panel2:#172338;
+  --line:#26364f;
+  --text:#f1f5ff;
+  --muted:#91a1ba;
+  --green:#39d69a;
+  --red:#ff657d;
+  --blue:#70a8ff;
+  --gold:#ffd36c;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+main {max-width:850px;margin:auto;padding:17px}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+h1 {font-size:23px;margin:0}
+h2 {font-size:17px;margin:0 0 12px}
+h3 {font-size:14px;margin:0 0 8px}
+p {line-height:1.5}
+.muted {color:var(--muted);font-size:12px}
+.panel {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:15px;
+  margin:12px 0;
+}
+.banner {
+  border:1px solid #725d2a;
+  background:#2b2414;
+  color:var(--gold);
+  padding:12px;
+  border-radius:12px;
+  font-size:12px;
+  margin-bottom:14px;
+}
+.status {font-size:11px;color:var(--green)}
+button,select,input {
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  border-radius:9px;
+  padding:11px;
+  font-size:13px;
+}
+button {cursor:pointer}
+button.primary {background:#2855a0;border-color:#477acb}
+button.danger {background:#54212e;border-color:#9d4055}
+button:disabled {opacity:.45}
+.controls {display:flex;gap:8px;flex-wrap:wrap}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.metric {
+  background:var(--panel2);
+  border-radius:11px;
+  padding:12px;
+  min-width:0;
+}
+.metric strong {display:block;font-size:20px;margin-top:5px}
+.coin {
+  display:inline-block;
+  padding:5px 9px;
+  background:#253754;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:bold;
+}
+.score {font-size:26px;font-weight:800}
+.green {color:var(--green)}
+.red {color:var(--red)}
+.gold {color:var(--gold)}
+.blue {color:var(--blue)}
+.market {
+  background:var(--panel2);
+  border:1px solid var(--line);
+  padding:13px;
+  border-radius:12px;
+  margin:10px 0;
+}
+.market-top {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+.market-title {font-weight:700;font-size:14px}
+.market-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin:12px 0;
+}
+.market-grid div {
+  background:#0d1727;
+  border-radius:8px;
+  padding:9px 5px;
+  text-align:center;
+  font-size:11px;
+}
+.market-grid strong {
+  display:block;
+  font-size:15px;
+  margin-top:5px;
+}
+ul {padding-left:18px;color:#c4d0e3;font-size:12px;line-height:1.7}
+input {width:100%;margin:5px 0 10px}
+label {font-size:12px;color:var(--muted)}
+hr {border:0;border-top:1px solid var(--line);margin:14px 0}
+.small {font-size:11px;color:var(--muted)}
+.lesson {
+  border-left:3px solid var(--blue);
+  padding:4px 0 4px 12px;
+  margin:12px 0;
+  font-size:13px;
+  line-height:1.5;
+}
+#message {font-size:12px;color:var(--muted);margin-top:9px}
+@media(max-width:430px) {
+  main {padding:12px}
+  .market-grid {grid-template-columns:repeat(2,1fr)}
+}
+</style>
 </head>
+
 <body>
-<header><div><h1>Kalshi Control</h1><div class="sub">Phone dashboard · paper mode</div></div><span class="status" id="connection">CONNECTING</span></header>
-<div class="banner"><b>SIMULATION ONLY.</b> This starter reads public Kalshi market data and records simulated positions in this browser. It cannot place real orders, access your account, or guarantee fills. No API secret belongs in this page.</div>
-<div class="grid">
-  <div class="card"><div class="label">Paper bankroll</div><div class="metric" id="bankrollMetric">$100.00</div><div class="small">Editable below</div></div>
-  <div class="card"><div class="label">Open paper positions</div><div class="metric" id="openCount">0</div><div class="small">Simulated only</div></div>
-  <div class="card"><div class="label">Unrealized P/L</div><div class="metric" id="unrealized">$0.00</div><div class="small">Uses latest available bid</div></div>
-  <div class="card"><div class="label">Daily realized P/L</div><div class="metric" id="dailyPnl">$0.00</div><div class="small">Browser-local paper ledger</div></div>
-</div>
-<section class="card section">
-  <div class="row"><h2>Risk controls</h2><span class="pill" id="botState">PAPER ACTIVE</span></div>
-  <div class="fieldrow">
-    <label class="small">Paper bankroll ($)<input class="field" id="bankroll" type="number" min="1" step="1" placeholder="Enter amount"></label>
-    <label class="small">Max risk per trade (%)<input class="field" id="tradePct" type="number" min="0.1" max="5" step="0.1" value="1"></label>
-    <label class="small">Daily loss stop (%)<input class="field" id="dailyPct" type="number" min="0.1" max="20" step="0.1" value="3"></label>
-    <label class="small">Max open positions<input class="field" id="maxOpen" type="number" min="1" max="20" step="1" value="2"></label>
+<main>
+
+<header>
+  <div>
+    <h1>⚡ Kalshi Control</h1>
+    <div class="muted">Crypto intelligence · 15-minute markets</div>
   </div>
-  <div class="row" style="margin-top:12px"><button class="btn secondary" id="saveSettings">Save limits</button><button class="btn danger" id="kill">KILL SWITCH</button></div>
-  <p class="small" id="riskNote">Risk limit: $1.00 per position · Daily stop: $3.00. These limits apply to this paper simulator only.</p>
-  <button class="btn secondary hidden" id="restart" style="width:100%;margin-top:8px">Resume paper simulator</button>
+  <div class="status" id="connection">● CONNECTING</div>
+</header>
+
+<div class="banner">
+  SIMULATION / DECISION SUPPORT ONLY — No real-money orders.
+  Signals are experimental, not verified predictions.
+</div>
+
+<section class="panel">
+  <div class="market-top">
+    <h2>Market intelligence</h2>
+    <button class="primary" id="refresh">Refresh</button>
+  </div>
+  <div class="muted" id="updated">Waiting for market data...</div>
+  <div class="grid" style="margin-top:12px">
+    <div class="metric">
+      <span class="muted">Active markets</span>
+      <strong id="activeCount">—</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Best ranking</span>
+      <strong id="bestScore">—</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Markets scanned</span>
+      <strong id="scanned">—</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Data errors</span>
+      <strong id="errors">—</strong>
+    </div>
+  </div>
+  <div id="message"></div>
 </section>
-<section class="section card" id="chartPanel"><div class="row"><h2>Price chart</h2><select class="field" id="chartInterval" style="width:auto;margin:0"><option value="60">1 hour</option><option value="1">1 minute</option><option value="1440">1 day</option></select></div><div class="small" id="chartTitle">Choose a market and tap Chart.</div><div id="chart" style="margin-top:12px"><div class="small">Historical chart will appear here.</div></div><div class="small">Kalshi candlesticks are historical market quotes, not a forecast.</div></section>
-<section class="section card">
-  <div class="row"><h2>Market scanner</h2><button class="btn secondary" id="refresh">Refresh</button></div>
-  <input class="field" id="search" placeholder="Search markets, e.g. Bitcoin, CPI, elections">
-  <div class="row" style="margin:10px 0"><span class="small" id="marketCount">Loading open markets…</span><span class="small">All categories</span></div>
-  <div id="markets"><div class="small">Fetching open markets from Kalshi…</div></div>
-  <button class="btn secondary hidden" id="more" style="width:100%">Load more markets</button>
-  <p class="small">Prices are market quotes, not objective probabilities or trade recommendations. Market availability and fields vary.</p>
+
+<section class="panel">
+  <h2>🏆 Best opportunities</h2>
+  <p class="muted">
+    Ranked by experimental momentum and market conditions.
+    Ranking score is NOT probability of winning.
+  </p>
+  <div id="best">
+    <p class="muted">Loading opportunities...</p>
+  </div>
 </section>
-<section class="section card"><h2>Paper positions</h2><div id="positions"><div class="small">No simulated positions yet.</div></div></section>
-<section class="section card"><h2>Trade journal</h2><div id="journal"><div class="small">Your simulated actions will appear here.</div></div><button class="btn secondary" id="export" style="width:100%;margin-top:10px">Export paper journal (CSV)</button></section>
-<section class="section"><h2>What the controls mean</h2><p class="small"><b>Bankroll:</b> the imaginary funds used by this simulator. <b>Risk per trade:</b> maximum amount allocated to one simulated position, not a guaranteed maximum loss in live trading. <b>Daily loss stop:</b> pauses new paper entries after realized daily losses reach the configured threshold. <b>Kill switch:</b> blocks new simulated entries; it does not close existing positions.</p></section>
+
+<section class="panel">
+  <h2>All crypto markets</h2>
+  <div class="controls">
+    <select id="filter">
+      <option value="ALL">All coins</option>
+      <option value="BTC">Bitcoin</option>
+      <option value="ETH">Ethereum</option>
+      <option value="DOGE">Dogecoin</option>
+      <option value="ZEC">Zcash</option>
+    </select>
+    <select id="sort">
+      <option value="score">Best ranking</option>
+      <option value="volume">Highest volume</option>
+      <option value="time">Time remaining</option>
+    </select>
+  </div>
+  <div id="markets">
+    <p class="muted">Waiting for scanner...</p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>💰 Paper trading</h2>
+  <p class="muted">
+    Practice with fictional money. No real Kalshi orders are submitted.
+  </p>
+  <div class="grid">
+    <div class="metric">
+      <span class="muted">Paper bankroll</span>
+      <strong id="bankroll">$100.00</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Realized profit/loss</span>
+      <strong id="pnl">$0.00</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Open positions</span>
+      <strong id="positions">0</strong>
+    </div>
+    <div class="metric">
+      <span class="muted">Available funds</span>
+      <strong id="available">$100.00</strong>
+    </div>
+  </div>
+
+  <hr>
+  <label>Market</label>
+  <select id="tradeMarket"></select>
+
+  <label>Side</label>
+  <select id="tradeSide">
+    <option value="YES">YES</option>
+    <option value="NO">NO</option>
+  </select>
+
+  <label>Amount to risk ($)</label>
+  <input id="tradeAmount" type="number" min="1" max="100" value="5">
+
+  <div class="controls">
+    <button class="primary" id="paperBuy">Open paper position</button>
+    <button class="danger" id="resetPaper">Reset simulation</button>
+  </div>
+  <div id="tradeMessage" class="small"></div>
+
+  <hr>
+  <h3>Open positions</h3>
+  <div id="openPositions" class="muted">No positions.</div>
+
+  <hr>
+  <h3>Trade history</h3>
+  <div id="history" class="muted">No completed trades.</div>
+</section>
+
+<section class="panel">
+  <h2>🧠 Learn the market</h2>
+
+  <div class="lesson">
+    <strong>1. What does 20¢ mean?</strong><br>
+    A 20¢ contract costs $0.20. If it wins, it pays $1 before fees.
+    If it loses, you lose the $0.20. Cheap does not mean undervalued.
+  </div>
+
+  <div class="lesson">
+    <strong>2. What does 83¢ mean?</strong><br>
+    An 83¢ contract costs $0.83 and pays $1 if correct.
+    Its gross profit is $0.17 per contract before fees.
+    Price is not a guaranteed probability.
+  </div>
+
+  <div class="lesson">
+    <strong>3. What is momentum?</strong><br>
+    Momentum measures how quickly an underlying asset is moving.
+    A sudden reversal can invalidate an earlier directional signal.
+  </div>
+
+  <div class="lesson">
+    <strong>4. Why check the order book?</strong><br>
+    The displayed price is not necessarily the price at which
+    you can buy or sell your desired quantity. Depth and spread matter.
+  </div>
+
+  <div class="lesson">
+    <strong>5. Why NO TRADE?</strong><br>
+    Mixed signals, wide spreads, missing data or poor exit liquidity
+    can make a trade unattractive. Skipping is a valid decision.
+  </div>
+</section>
+
+<footer class="small" style="text-align:center;padding:18px">
+  Kalshi Control · Experimental decision support · Paper mode
+</footer>
+
+</main>
+
 <script>
-const $=id=>document.getElementById(id);const fmt=n=>'$'+Number(n||0).toFixed(2);let markets=[],cursor=null,selectedChart=null;
-const defaults={bankroll:0,tradePct:1,dailyPct:3,maxOpen:2,halted:false,positions:[],journal:[],day:new Date().toISOString().slice(0,10)};
-let state={...defaults,...JSON.parse(localStorage.getItem('kalshiPaperState')||'{}')};
-function save(){localStorage.setItem('kalshiPaperState',JSON.stringify(state));renderState()}
-function today(){const d=new Date().toISOString().slice(0,10);if(state.day!==d){state.day=d;state.journal.unshift({time:new Date().toISOString(),type:'New UTC day',detail:'Daily realized P/L counter reset'});save()}}
-function n(v){const x=Number(v);return Number.isFinite(x)?x:0}
-function price(m,side){let p=side==='YES'?m.yes_ask:m.no_ask;if(p==null)p=side==='YES'?m.last_price:(m.last_price==null?null:1-m.last_price);return p}
-function exitPrice(m,side){let p=side==='YES'?m.yes_bid:m.no_bid;if(p==null)p=side==='YES'?m.last_price:(m.last_price==null?null:1-m.last_price);return p}
-function pnl(pos){const m=markets.find(x=>x.ticker===pos.ticker);const px=m?exitPrice(m,pos.side):pos.entry;return (px-pos.entry)*pos.contracts}
-function dailyRealized(){return state.journal.filter(x=>x.type==='Closed'&&x.time.slice(0,10)===state.day).reduce((s,x)=>s+n(x.pnl),0)}
-function renderState(){today();const open=state.positions.filter(p=>!p.closed);const u=open.reduce((s,p)=>s+pnl(p),0);$('bankrollMetric').textContent=fmt(state.bankroll);$('openCount').textContent=open.length;$('unrealized').textContent=fmt(u);$('dailyPnl').textContent=fmt(dailyRealized());$('unrealized').className='metric '+(u>=0?'good':'dangertext');$('dailyPnl').className='metric '+(dailyRealized()>=0?'good':'dangertext');$('botState').textContent=state.halted?'HALTED':'PAPER ACTIVE';$('botState').style.color=state.halted?'var(--red)':'var(--green)';$('kill').textContent=state.halted?'STOPPED':'KILL SWITCH';$('kill').disabled=state.halted;$('restart').classList.toggle('hidden',!state.halted);$('riskNote').textContent=`Risk limit: ${fmt(state.bankroll*state.tradePct/100)} per position · Daily stop: ${fmt(state.bankroll*state.dailyPct/100)}. Paper simulator only.`;renderPositions();renderJournal()}
-function renderMarkets(){const q=$('search').value.toLowerCase();const filtered=markets.filter(m=>(m.title+' '+m.ticker+' '+m.category).toLowerCase().includes(q));$('marketCount').textContent=`${filtered.length} shown · ${markets.length} loaded`;if(!filtered.length){$('markets').innerHTML='<p class="small">No matching open markets in the loaded results.</p>';return}$('markets').innerHTML=filtered.map(m=>{const y=m.yes_bid??m.last_price;const pct=y==null?null:Math.max(0,Math.min(100,y*100));return `<div class="market"><div class="row"><span class="tag">${esc(m.category)}</span><span class="small">${esc(m.ticker)}</span></div><div class="market-title" style="margin-top:7px">${esc(m.title)}</div><div class="row" style="margin-top:8px"><span class="small">YES bid ${y==null?'—':(y*100).toFixed(1)+'¢'}</span><span class="small">Last ${m.last_price==null?'—':(m.last_price*100).toFixed(1)+'¢'}</span><span class="small">Vol ${m.volume==null?'—':Math.round(m.volume).toLocaleString()}</span></div><div class="prob"><i style="width:${pct??0}%"></i></div><div class="actions"><button class="btn secondary" onclick="showChart('${escAttr(m.ticker)}')">Chart</button><button class="btn" ${state.halted?'disabled':''} onclick="openPaper('${escAttr(m.ticker)}','YES')">Paper YES</button><button class="btn secondary" ${state.halted?'disabled':''} onclick="openPaper('${escAttr(m.ticker)}','NO')">Paper NO</button></div></div>`}).join('')}
-async function showChart(ticker){const m=markets.find(x=>x.ticker===ticker);if(!m||!m.series_ticker){$('chartTitle').textContent='Series information unavailable for this market.';return}selectedChart=ticker;$('chartTitle').textContent=m.title+' · Loading chart…';$('chart').innerHTML='<div class="small">Loading historical candles…</div>';try{const interval=$('chartInterval').value;const r=await fetch(`/api/markets/${encodeURIComponent(ticker)}/candlesticks?series_ticker=${encodeURIComponent(m.series_ticker)}&period_interval=${interval}`);if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();const candles=(d.candlesticks||[]).filter(c=>c.price&&c.price.close_dollars!=null);if(!candles.length)throw Error('No candles returned for this period');const vals=candles.map(c=>Number(c.price.close_dollars));const min=Math.min(...vals),max=Math.max(...vals),span=max-min||0.01;const pts=vals.map((v,i)=>`${(i/(Math.max(vals.length-1,1))*300+10).toFixed(1)},${(100-((v-min)/span)*82).toFixed(1)}`).join(' ');$('chartTitle').textContent=m.title+' · '+candles.length+' candles';$('chart').innerHTML=`<svg viewBox="0 0 320 120" width="100%" role="img" aria-label="Historical market price chart"><line x1="8" y1="18" x2="312" y2="18" stroke="#293648"/><line x1="8" y1="59" x2="312" y2="59" stroke="#293648"/><line x1="8" y1="100" x2="312" y2="100" stroke="#293648"/><polyline points="${pts}" fill="none" stroke="#3bd49b" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><text x="8" y="116" font-size="9" fill="#9eacbd">Earlier</text><text x="312" y="116" text-anchor="end" font-size="9" fill="#9eacbd">Latest</text></svg><div class="row small"><span>Low ${(min*100).toFixed(1)}¢</span><span>High ${(max*100).toFixed(1)}¢</span><span>Latest ${(vals.at(-1)*100).toFixed(1)}¢</span></div>`}catch(e){$('chartTitle').textContent=m.title;$('chart').innerHTML=`<div class="small">Chart unavailable: ${esc(e.message)}</div>`}}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function escAttr(s){return String(s).replace(/[^A-Za-z0-9_-]/g,'')}
-async function load(reset=true){$('connection').textContent='SYNCING';try{const url='/api/markets?limit=100'+(!reset&&cursor?'&cursor='+encodeURIComponent(cursor):'');const r=await fetch(url);if(!r.ok)throw Error('HTTP '+r.status);const data=await r.json();markets=reset?data.markets:markets.concat(data.markets);cursor=data.cursor||null;$('more').classList.toggle('hidden',!cursor);$('connection').textContent='LIVE DATA';renderMarkets();renderState()}catch(e){$('connection').textContent='OFFLINE';$('markets').innerHTML='<p class="small">Could not load Kalshi market data. Check connection and retry. '+esc(e.message)+'</p>'}}
-window.openPaper=(ticker,side)=>{today();if(state.halted)return alert('Simulator is halted. Resume it first.');const m=markets.find(x=>x.ticker===ticker);if(!m)return;const p=price(m,side);if(p==null||p<=0||p>=1)return alert('No usable ask/last price for this side. Try another market.');const risk=state.bankroll*state.tradePct/100;if(risk<=0)return alert('Set a valid bankroll and risk percentage.');const open=state.positions.filter(x=>!x.closed);if(open.length>=state.maxOpen)return alert('Maximum open positions reached.');if(dailyRealized()<=-state.bankroll*state.dailyPct/100)return alert('Daily loss limit reached. New entries paused.');const contracts=risk/p;const pos={id:crypto.randomUUID(),ticker, title:m.title,side,entry:p,contracts,cost:risk,opened:new Date().toISOString(),closed:false};state.positions.unshift(pos);state.journal.unshift({time:pos.opened,type:'Opened',detail:`Paper ${side} · ${m.title} · ${contracts.toFixed(2)} contracts at ${(p*100).toFixed(1)}¢`});save()};
-function closePaper(id){const p=state.positions.find(x=>x.id===id);if(!p||p.closed)return;const m=markets.find(x=>x.ticker===p.ticker);const px=m?exitPrice(m,p.side):null;if(px==null)return alert('No current exit quote available. Refresh market data and try again.');const profit=(px-p.entry)*p.contracts;p.closed=true;p.closedAt=new Date().toISOString();p.exit=px;p.pnl=profit;state.journal.unshift({time:p.closedAt,type:'Closed',detail:`Closed ${p.side} · ${p.title}`,pnl:profit});save()}
-function renderPositions(){const open=state.positions.filter(p=>!p.closed);$('positions').innerHTML=open.length?open.map(p=>`<div class="pos"><div class="row"><b>${esc(p.side)} · ${esc(p.title)}</b><span class="${pnl(p)>=0?'good':'dangertext'}">${fmt(pnl(p))}</span></div><div class="small">${p.contracts.toFixed(2)} contracts · entry ${(p.entry*100).toFixed(1)}¢ · cost ${fmt(p.cost)}</div><button class="btn secondary" style="width:100%;margin-top:8px" onclick="closePaper('${p.id}')">Close simulated position</button></div>`).join(''):'<div class="small">No open simulated positions.</div>'}
-function renderJournal(){$('journal').innerHTML=state.journal.length?state.journal.slice(0,12).map(j=>`<div class="pos"><div class="row"><b>${esc(j.type)}</b><span class="small">${new Date(j.time).toLocaleString()}</span></div><div class="small">${esc(j.detail||'')}</div>${j.pnl!=null?`<div class="${j.pnl>=0?'good':'dangertext'}">${fmt(j.pnl)}</div>`:''}</div>`).join(''):'<div class="small">No simulated activity yet.</div>'}
-$('chartInterval').onchange=()=>{if(selectedChart)showChart(selectedChart)};$('refresh').onclick=()=>load(true);$('more').onclick=()=>load(false);$('search').oninput=renderMarkets;$('saveSettings').onclick=()=>{const b=n($('bankroll').value),t=n($('tradePct').value),d=n($('dailyPct').value),o=n($('maxOpen').value);if(b<=0||t<=0||t>5||d<=0||d>20||o<1||o>20)return alert('Check settings: bankroll > 0, trade risk 0.1–5%, daily stop 0.1–20%, open positions 1–20.');state.bankroll=b;state.tradePct=t;state.dailyPct=d;state.maxOpen=Math.floor(o);save()};$('kill').onclick=()=>{state.halted=true;state.journal.unshift({time:new Date().toISOString(),type:'KILL SWITCH',detail:'New paper entries disabled. Existing positions remain open.'});save()};$('restart').onclick=()=>{state.halted=false;state.journal.unshift({time:new Date().toISOString(),type:'Resumed',detail:'Paper simulator manually resumed.'});save()};$('export').onclick=()=>{const rows=[['time','type','detail','pnl'],...state.journal.map(x=>[x.time,x.type,x.detail||'',x.pnl??''])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='kalshi-paper-journal.csv';a.click();URL.revokeObjectURL(a.href)};
-$('bankroll').value=state.bankroll||'';$('tradePct').value=state.tradePct;$('dailyPct').value=state.dailyPct;$('maxOpen').value=state.maxOpen;renderState();load();
-if('serviceWorker'in navigator)navigator.serviceWorker.register('/static/sw.js').catch(()=>{});
+"use strict";
+
+const API = "/api/crypto/15m";
+
+let marketData = [];
+let paper = loadPaper();
+
+function loadPaper() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem("kalshiPaperState")
+    );
+
+    if (
+      saved &&
+      typeof saved.bankroll === "number" &&
+      Array.isArray(saved.open) &&
+      Array.isArray(saved.history)
+    ) return saved;
+  } catch (e) {}
+
+  return {
+    initial:100,
+    bankroll:100,
+    realized:0,
+    open:[],
+    history:[]
+  };
+}
+
+function savePaper() {
+  localStorage.setItem(
+    "kalshiPaperState",
+    JSON.stringify(paper)
+  );
+}
+
+function money(value) {
+  return "$" + Number(value || 0).toFixed(2);
+}
+
+function pct(value) {
+  return Number(value || 0).toFixed(2) + "%";
+}
+
+function esc(value) {
+  return String(value ?? "").replace(
+    /[&<>"']/g,
+    c => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[c])
+  );
+}
+
+function priceFor(market, side) {
+  return side === "YES"
+    ? market.yes_ask
+    : market.no_ask;
+}
+
+function sideFor(market) {
+  return market.analysis?.suggested_side || "NO TRADE";
+}
+
+function renderMarket(market, rank) {
+  const analysis = market.analysis || {};
+  const momentum = market.underlying || {};
+  const entry = analysis.entry;
+  const score = analysis.ranking_score || 0;
+
+  const direction = analysis.direction?.direction || "UNKNOWN";
+
+  const scoreColor =
+    score >= 70 ? "green" :
+    score >= 45 ? "gold" : "red";
+
+  const reasons = (analysis.reasons || [])
+    .map(reason => `<li>${esc(reason)}</li>`)
+    .join("");
+
+  const price = entry
+    ? money(entry.entry_price)
+    : "Unavailable";
+
+  const profit = entry
+    ? money(entry.gross_profit_per_dollar) + " per $1"
+    : "No calculated entry";
+
+  const spot = momentum.available
+    ? money(momentum.current_price)
+    : "Unavailable";
+
+  return `
+  <article class="market">
+    <div class="market-top">
+      <div>
+        <span class="coin">${esc(market.coin)}</span>
+        <div class="market-title" style="margin-top:7px">
+          ${esc(market.title)}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="score ${scoreColor}">${score}</div>
+        <div class="small">Ranking score</div>
+      </div>
+    </div>
+
+    <div class="market-grid">
+      <div>YES<strong>${(market.yes_ask*100).toFixed(1)}¢</strong></div>
+      <div>NO<strong>${(market.no_ask*100).toFixed(1)}¢</strong></div>
+      <div>Time left<strong>${market.minutes_until_close}m</strong></div>
+      <div>Volume<strong>${Number(market.volume).toLocaleString()}</strong></div>
+    </div>
+
+    <div class="grid">
+      <div class="metric">
+        <span class="muted">Directional hint</span>
+        <strong class="${direction==="UP"?"green":direction==="DOWN"?"red":"gold"}">
+          ${esc(direction)}
+        </strong>
+      </div>
+      <div class="metric">
+        <span class="muted">Suggested action</span>
+        <strong>${esc(analysis.recommendation || "NO TRADE")}</strong>
+      </div>
+      <div class="metric">
+        <span class="muted">Suggested entry</span>
+        <strong>${esc(analysis.suggested_side || "None")}</strong>
+      </div>
+      <div class="metric">
+        <span class="muted">Underlying spot</span>
+        <strong>${esc(spot)}</strong>
+      </div>
+    </div>
+
+    <p class="small">
+      Short movement:
+      ${momentum.available
+        ? pct(momentum.short_change_percent)
+        : "Unavailable"}
+      · Broader movement:
+      ${momentum.available
+        ? pct(momentum.longer_change_percent)
+        : "Unavailable"}
+    </p>
+
+    <p class="small">
+      YES bid/ask spread: ${pct(market.yes_spread*100)}
+      · NO bid/ask spread: ${pct(market.no_spread*100)}
+    </p>
+
+    <ul>${reasons}</ul>
+
+    <div class="small">
+      ${entry
+        ? `Entry ${esc(analysis.suggested_side)} at ${price}; gross profit if correct: ${profit}.`
+        : "No valid directional entry currently available."}
+    </div>
+
+    <div class="small" style="margin-top:8px">
+      ${esc(analysis.risk_warning || "")}
+    </div>
+
+    <div class="controls" style="margin-top:10px">
+      <button class="primary" data-trade="${esc(market.ticker)}" data-side="YES">Paper YES</button>
+      <button data-trade="${esc(market.ticker)}" data-side="NO">Paper NO</button>
+    </div>
+  </article>`;
+}
+
+function renderAll() {
+  const filter = document.getElementById("filter").value;
+  const sort = document.getElementById("sort").value;
+
+  let filtered = marketData.filter(m =>
+    filter === "ALL" || m.coin === filter
+  );
+
+  filtered = [...filtered];
+
+  if (sort === "score") {
+    filtered.sort((a,b) =>
+      b.analysis.ranking_score - a.analysis.ranking_score
+    );
+  } else if (sort === "volume") {
+    filtered.sort((a,b) => b.volume - a.volume);
+  } else {
+    filtered.sort((a,b) =>
+      a.seconds_until_close - b.seconds_until_close
+    );
+  }
+
+  document.getElementById("markets").innerHTML =
+    filtered.length
+      ? filtered.map((m,i)=>renderMarket(m,i+1)).join("")
+      : '<p class="muted">No active markets available.</p>';
+
+  const best = marketData.filter(m =>
+    ["TOP WATCH","WATCH","WATCH - WIDE SPREAD"].includes(
+      m.analysis.recommendation
+    )
+  ).slice(0,5);
+
+  document.getElementById("best").innerHTML =
+    best.length
+      ? best.map((m,i)=>renderMarket(m,i+1)).join("")
+      : '<p class="gold">NO STRONG OPPORTUNITIES. No trade is recommended.</p>';
+
+  document.getElementById("tradeMarket").innerHTML =
+    marketData.map(m =>
+      `<option value="${esc(m.ticker)}">${esc(m.coin)} · ${esc(m.ticker)}</option>`
+    ).join("") ||
+    '<option value="">No active markets</option>';
+
+  document.getElementById("activeCount").textContent = marketData.length;
+  document.getElementById("scanned").textContent = marketData.length;
+  document.getElementById("bestScore").textContent =
+    best.length ? best[0].analysis.ranking_score : "—";
+}
+
+async function refresh() {
+  const message = document.getElementById("message");
+  const connection = document.getElementById("connection");
+
+  message.textContent = "Scanning markets and underlying prices...";
+  connection.textContent = "● SCANNING";
+
+  try {
+    const response = await fetch(API, {
+      cache:"no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Server returned " + response.status);
+    }
+
+    const data = await response.json();
+
+    marketData = Array.isArray(data.markets)
+      ? data.markets
+      : [];
+
+    document.getElementById("errors").textContent =
+      (data.errors || []).length;
+
+    document.getElementById("updated").textContent =
+      "Checked " + new Date(
+        data.checked_at || Date.now()
+      ).toLocaleTimeString();
+
+    if (data.scanner_status === "NO_ACTIVE_MARKETS") {
+      message.textContent =
+        "No active markets found. Do not trade closed contracts.";
+    } else {
+      message.textContent =
+        "Active markets found. Signals are experimental, not verified predictions.";
+    }
+
+    connection.textContent = "● CONNECTED";
+    renderAll();
+
+  } catch (error) {
+    connection.textContent = "● ERROR";
+    message.textContent =
+      "Could not load scanner: " + error.message;
+  }
+}
+
+function renderPaper() {
+  const reserved = paper.open.reduce(
+    (sum,p) => sum + p.cost,
+    0
+  );
+
+  const available = paper.bankroll;
+
+  document.getElementById("bankroll").textContent =
+    money(paper.initial + paper.realized);
+
+  document.getElementById("pnl").textContent =
+    money(paper.realized);
+
+  document.getElementById("pnl").className =
+    paper.realized >= 0 ? "green" : "red";
+
+  document.getElementById("positions").textContent =
+    paper.open.length;
+
+  document.getElementById("available").textContent =
+    money(available);
+
+  document.getElementById("openPositions").innerHTML =
+    paper.open.length
+      ? paper.open.map(p => `
+        <div class="market">
+          <strong>${esc(p.coin)} ${esc(p.side)}</strong>
+          <div class="small">${esc(p.ticker)}</div>
+          Cost: ${money(p.cost)} · Entry: ${(p.price*100).toFixed(1)}¢
+          <div style="margin-top:8px">
+            <button class="danger" data-close="${esc(p.id)}">
+              Close paper position at current bid
+            </button>
+          </div>
+        </div>
+      `).join("")
+      : "No open positions.";
+
+  document.getElementById("history").innerHTML =
+    paper.history.length
+      ? paper.history.slice(-15).reverse().map(p => `
+        <div class="market">
+          ${esc(p.coin)} ${esc(p.side)} ·
+          ${esc(p.result)} ·
+          <strong class="${p.pnl>=0?"green":"red"}">
+            ${money(p.pnl)}
+          </strong>
+        </div>
+      `).join("")
+      : "No completed trades.";
+}
+
+function openPaper(ticker, side) {
+  const market = marketData.find(m => m.ticker === ticker);
+
+  if (!market) {
+    document.getElementById("tradeMessage").textContent =
+      "Market not found.";
+    return;
+  }
+
+  if (market.status !== "open" && market.status !== "active") {
+    return;
+  }
+
+  const price = priceFor(market, side);
+  const amount = Number(
+    document.getElementById("tradeAmount").value
+  );
+
+  if (!price || price <= 0 || price >= 1) {
+    document.getElementById("tradeMessage").textContent =
+      "Invalid entry price.";
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount < 1) {
+    document.getElementById("tradeMessage").textContent =
+      "Enter at least $1.";
+    return;
+  }
+
+  if (amount > paper.bankroll) {
+    document.getElementById("tradeMessage").textContent =
+      "Not enough paper bankroll.";
+    return;
+  }
+
+  const shares = amount / price;
+
+  paper.bankroll -= amount;
+
+  paper.open.push({
+    id:Date.now().toString() + Math.random().toString(16).slice(2),
+    ticker,
+    coin:market.coin,
+    side,
+    price,
+    cost:amount,
+    shares,
+    opened:new Date().toISOString()
+  });
+
+  savePaper();
+  renderPaper();
+
+  document.getElementById("tradeMessage").textContent =
+    `Paper ${side} position opened for ${money(amount)}.`;
+}
+
+function closePaper(id) {
+  const index = paper.open.findIndex(p => p.id === id);
+
+  if (index < 0) return;
+
+  const position = paper.open[index];
+
+  const market = marketData.find(
+    m => m.ticker === position.ticker
+  );
+
+  if (!market) {
+    document.getElementById("tradeMessage").textContent =
+      "Market data unavailable. Position not closed.";
+    return;
+  }
+
+  const bid = position.side === "YES"
+    ? market.yes_bid
+    : market.no_bid;
+
+  if (!Number.isFinite(bid) || bid < 0 || bid > 1) {
+    return;
+  }
+
+  const proceeds = position.shares * bid;
+  const pnl = proceeds - position.cost;
+
+  paper.bankroll += proceeds;
+  paper.realized += pnl;
+
+  paper.history.push({
+    coin:position.coin,
+    ticker:position.ticker,
+    side:position.side,
+    result:"Paper closed",
+    pnl,
+    proceeds,
+    date:new Date().toISOString()
+  });
+
+  paper.open.splice(index,1);
+
+  savePaper();
+  renderPaper();
+
+  document.getElementById("tradeMessage").textContent =
+    `Paper position closed. Estimated P/L: ${money(pnl)} before fees.`;
+}
+
+document.addEventListener("click", event => {
+  const tradeButton = event.target.closest("[data-trade]");
+
+  if (tradeButton) {
+    openPaper(
+      tradeButton.dataset.trade,
+      tradeButton.dataset.side
+    );
+  }
+
+  const closeButton = event.target.closest("[data-close]");
+
+  if (closeButton) {
+    closePaper(closeButton.dataset.close);
+  }
+});
+
+document.getElementById("refresh").addEventListener(
+  "click", refresh
+);
+
+document.getElementById("filter").addEventListener(
+  "change", renderAll
+);
+
+document.getElementById("sort").addEventListener(
+  "change", renderAll
+);
+
+document.getElementById("paperBuy").addEventListener(
+  "click", () => openPaper(
+    document.getElementById("tradeMarket").value,
+    document.getElementById("tradeSide").value
+  )
+);
+
+document.getElementById("resetPaper").addEventListener(
+  "click", () => {
+    if (!confirm("Reset all paper trading history and bankroll?")) {
+      return;
+    }
+
+    paper = {
+      initial:100,
+      bankroll:100,
+      realized:0,
+      open:[],
+      history:[]
+    };
+
+    savePaper();
+    renderPaper();
+  }
+);
+
+renderPaper();
+refresh();
+
+// Refresh every 60 seconds to limit API usage.
+setInterval(refresh,60000);
 </script>
-</body></html>
+</body>
+</html>
